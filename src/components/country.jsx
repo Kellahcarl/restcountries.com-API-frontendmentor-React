@@ -4,13 +4,17 @@ import useFetch from "./useFetch";
 
 const Country = ({ numberWithCommas, getCountryName }) => {
   const countryName = useParams();
+
   const { data, loading } = useFetch(
     `https://restcountries.com/v2/name/${countryName.countryName}?fullText=true`
   );
+
   const [country, setCountry] = useState(data);
+
   useEffect(() => {
     setCountry(data);
   }, [data]);
+
   return (
     <div className="countryPage">
       {loading && <h1 className="loading">Loading ...</h1>}

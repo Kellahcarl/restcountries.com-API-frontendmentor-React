@@ -1,25 +1,56 @@
-import React from "react";
+import React, { useReducer } from "react";
 import Header from "./components/navbar";
-import { useState } from "react";
 import Countries from "./components/countries";
 import Country from "./components/country";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import useFetch from "./components/useFetch";
+import { reducer } from "./reducers/searchReducer";
+
+const initialState = {
+  inputField: undefined,
+  search: undefined,
+  filtra: "All",
+  data: [],
+};
 
 function App() {
-  const [inputField, setInputField] = useState(undefined);
-  const [search, setSearch] = useState(undefined);
-  const [filtra, setFilter] = useState("All");
-  const { data } = useFetch("https://restcountries.com/v2/all");
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { inputField, search, filtra, data } = state;
+
+  const { data: fetchData } = useFetch("https://restcountries.com/v2/all");
+
+  // Dispatch actions to update state
+  const setInputField = (value) => {
+    dispatch({ type: "SET_INPUT_FIELD", payload: value });
+  };
+
+  const setSearch = (value) => {
+    dispatch({ type: "SET_SEARCH", payload: value });
+  };
+
+  const setFilter = (value) => {
+    dispatch({ type: "SET_FILTER", payload: value });
+  };
+
+  const setData = (value) => {
+    dispatch({ type: "SET_DATA", payload: value });
+  };
+
+  React.useEffect(() => {
+    setData(fetchData);
+  }, [fetchData]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setSearch(inputField);
   };
+
   const handleSelect = (e) => {
     setFilter(e.target.value);
     setSearch(undefined);
     setInputField("");
   };
+
   const getCountryName = (code) => {
     let countryName;
     const country = data.filter((element) => {
@@ -28,9 +59,11 @@ function App() {
     countryName = country[0].name;
     return countryName;
   };
+
   const numberWithCommas = (number) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
+
   return (
     <Router>
       <div className="App">
@@ -83,4 +116,5 @@ function App() {
     </Router>
   );
 }
+
 export default App;
